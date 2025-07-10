@@ -1,0 +1,13 @@
+applications:
+  spring-boot-template-test:
+    project: default
+    source:
+      path: environments/test/applications/spring-boot-template
+    destination:
+      namespace: test
+  products-service-test:
+    project: default
+    source:
+      path: environments/test/applications/products-service
+    destination:
+      namespace: test
