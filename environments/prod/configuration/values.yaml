@@ -1,7 +1,7 @@
 applications:
-  spring-boot-template-prod:
+  nodejs-template-prod:
     project: default
     source:
-      path: environments/prod/applications/spring-boot-template
+      path: environments/prod/applications/nodejs-template
     destination:
       namespace: prod

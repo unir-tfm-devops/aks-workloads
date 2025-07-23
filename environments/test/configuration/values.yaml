@@ -1,7 +1,7 @@
 applications:
-  spring-boot-template-test:
+  nodejs-template-test:
     project: default
     source:
-      path: environments/test/applications/spring-boot-template
+      path: environments/test/applications/nodejs-template
     destination:
       namespace: test

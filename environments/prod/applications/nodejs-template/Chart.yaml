@@ -1,0 +1,8 @@
+apiVersion: v2
+name: nodejs-template
+version: 1.0.0
+description: Helm chart for nodejs-template deployment
+dependencies:
+  - name: nodejs-template
+    version: 0.2.0
+    repository: "http://3.238.99.68"
