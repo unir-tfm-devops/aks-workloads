@@ -53,7 +53,7 @@ jobs:
         with:
           app-id: ${{ vars.UNIR_TFM_APP_ID }}
           private-key: ${{ secrets.UNIR_TFM_APP_PRIVATE_KEY }}
-          repositories: "eks-workloads"
+          repositories: "aks-workloads"
 
       - name: Modify values.yaml for Environment
         run: |
@@ -89,7 +89,7 @@ jobs:
         with:
           app-id: ${{ vars.UNIR_TFM_APP_ID }}
           private-key: ${{ secrets.UNIR_TFM_APP_PRIVATE_KEY }}
-          repositories: "eks-workloads"
+          repositories: "aks-workloads"
 
       - name: Create Application Chart.yaml
         run: |
@@ -154,7 +154,7 @@ jobs:
         with:
           app-id: ${{ vars.UNIR_TFM_APP_ID }}
           private-key: ${{ secrets.UNIR_TFM_APP_PRIVATE_KEY }}
-          repositories: "eks-workloads"
+          repositories: "aks-workloads"
 
       - name: Create Pull Request
         id: create_pr
@@ -190,8 +190,8 @@ jobs:
 
           echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
-  rds-changes:
-    name: RDS Changes
+  db-changes:
+    name: DB Changes
     needs: [extract_info]
     runs-on: ubuntu-latest
     steps:
@@ -207,11 +207,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.get_token.outputs.token }}
-          repository: ${{ github.repository_owner }}/infra-rds
-          path: infra-rds
+          repository: ${{ github.repository_owner }}/infra-azure-dbs
+          path: infra-azure-dbs
 
       - name: Add new DB to environment
-        working-directory: infra-rds
+        working-directory: infra-azure-dbs
         env:
           NAME: ${{ needs.extract_info.outputs.name }}
           ENV: ${{ needs.extract_info.outputs.environment }}
@@ -225,7 +225,7 @@ jobs:
             username      = "${{ env.NAME }}-${{ env.ENV }}"
             password      = "${{ env.NAME }}-${{ env.ENV }}"
 
-            depends_on = [time_sleep.wait_for_rds]
+            depends_on = [time_sleep.wait_for_db]
 
             providers = {
               postgresql = postgresql.${{ env.ENV }}
@@ -233,23 +233,23 @@ jobs:
           }
           EOF
 
-      - name: Commit RDS database changes
-        working-directory: infra-rds
+      - name: Commit DB database changes
+        working-directory: infra-azure-dbs
         env:
           NAME: ${{ needs.extract_info.outputs.name }}
           ENV: ${{ needs.extract_info.outputs.environment }}
         run: |
           git config --global user.email "unir-tfm-devops[bot]@users.noreply.github.com"
           git config --global user.name "unir-tfm-devops[bot]"
-          git remote set-url origin https://x-access-token:${{ steps.get_token.outputs.token }}@github.com/${{ github.repository_owner }}/infra-rds
+          git remote set-url origin https://x-access-token:${{ steps.get_token.outputs.token }}@github.com/${{ github.repository_owner }}/infra-azure-dbs
           git checkout -b feature/new-${{ env.ENV }}-db-${{ env.NAME }}
           git add databases-${{ env.ENV }}.tf
           git commit -m "Add new DB for ${{ env.NAME }} in ${{ env.ENV }} environment"
           git push origin feature/new-${{ env.ENV }}-db-${{ env.NAME }}
 
-  create-rds-pr:
-    name: Create RDS PR
-    needs: [rds-changes, extract_info]
+  create-db-pr:
+    name: Create DB PR
+    needs: [db-changes, extract_info]
     runs-on: ubuntu-latest
     outputs:
       pr_url: ${{ env.PR_URL }}
@@ -260,13 +260,13 @@ jobs:
         with:
           app-id: ${{ vars.UNIR_TFM_APP_ID }}
           private-key: ${{ secrets.UNIR_TFM_APP_PRIVATE_KEY }}
-          repositories: "infra-rds"
+          repositories: "infra-azure-dbs"
 
-      - name: Checkout infra-rds Repository
+      - name: Checkout infra-azure-dbs Repository
         uses: actions/checkout@v4
         with:
           token: ${{ steps.get_token.outputs.token }}
-          repository: ${{ github.repository_owner }}/infra-rds
+          repository: ${{ github.repository_owner }}/infra-azure-dbs
 
       - name: Create Pull Request
         id: create_pr
@@ -303,7 +303,7 @@ jobs:
 
   comment-on-issue:
     name: Comment on Issue
-    needs: [create-pr, create-rds-pr, extract_info]
+    needs: [create-pr, create-db-pr, extract_info]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -315,14 +315,14 @@ jobs:
         with:
           app-id: ${{ vars.UNIR_TFM_APP_ID }}
           private-key: ${{ secrets.UNIR_TFM_APP_PRIVATE_KEY }}
-          repositories: "eks-workloads"
+          repositories: "aks-workloads"
 
       - name: Comment on Issue
         env:
           GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           PR_URL: ${{ needs.create-pr.outputs.pr_url }}
-          RDS_PR_URL: ${{ needs.create-rds-pr.outputs.pr_url }}
+          DB_PR_URL: ${{ needs.create-db-pr.outputs.pr_url }}
           ENV: ${{ needs.extract_info.outputs.environment }}
         run: |
           gh issue comment ${{ env.ISSUE_NUMBER }} --body "✅ Pull requests have been created to address this issue:
@@ -330,7 +330,7 @@ jobs:
           ## ${{ env.ENV }} Environment PRs
 
           ### 1. Database PR (Must be merged FIRST!)
-          **PR:** ${{ env.RDS_PR_URL }}
+          **PR:** ${{ env.DB_PR_URL }}
 
           **Changes Made:**
           - Added new database module configuration for ${{ env.ENV }} environment
@@ -351,7 +351,7 @@ jobs:
           3. **Then review and merge the ${{ env.ENV }} ArgoCD application PR**
 
           ### Summary
-          - **${{ env.ENV }} Database PR:** ${{ env.RDS_PR_URL }}
+          - **${{ env.ENV }} Database PR:** ${{ env.DB_PR_URL }}
           - **${{ env.ENV }} ArgoCD Application PR:** ${{ env.PR_URL }}
 
           Please follow the merge order to ensure the database is ready before deploying the application."
