@@ -1,6 +1,6 @@
-variable "aws_region" {
+variable "azure_location" {
   type    = string
-  default = "us-east-1"
+  default = "East US"
 }
 
 variable "namespace" {
@@ -9,8 +9,14 @@ variable "namespace" {
   default     = "argocd"
 }
 
-variable "eks_cluster_name" {
+variable "aks_cluster_name" {
   type        = string
-  description = "EKS cluster name"
-  default     = "unir-tfm-eks-cluster"
+  description = "AKS cluster name"
+  default     = "unir-tfm-aks-cluster"
+}
+
+variable "resource_group_name" {
+  type        = string
+  description = "Azure resource group name"
+  default     = "unir-tfm-devops-rg"
 }

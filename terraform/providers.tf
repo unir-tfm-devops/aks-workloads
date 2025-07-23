@@ -1,19 +1,17 @@
-provider "aws" {
-  region = var.aws_region
+provider "azurerm" {
+  features {}
 }
 
-data "aws_eks_cluster" "cluster" {
-  name = var.eks_cluster_name
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = var.eks_cluster_name
+data "azurerm_kubernetes_cluster" "cluster" {
+  name                = var.aks_cluster_name
+  resource_group_name = var.resource_group_name
 }
 
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.cluster.token
+    host                   = data.azurerm_kubernetes_cluster.cluster.kube_config[0].host
+    client_certificate     = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_config[0].client_certificate)
+    client_key             = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_config[0].client_key)
+    cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.cluster.kube_config[0].cluster_ca_certificate)
   }
 }

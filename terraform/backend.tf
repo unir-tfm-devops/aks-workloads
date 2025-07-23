@@ -1,15 +1,15 @@
 terraform {
-  backend "s3" {
-    bucket  = "unir-tfm-eks-terraform-state"
-    key     = "eks-workloads/terraform.tfstate"
-    region  = "us-east-1"
-    encrypt = true
+  backend "azurerm" {
+    resource_group_name  = "unir-tfm-devops-rg"
+    storage_account_name = "unirtfmazurestate"
+    container_name       = "tfstate"
+    key                  = "aks-workloads/terraform.tfstate"
   }
 
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.110.0"
     }
     helm = {
       source  = "hashicorp/helm"
