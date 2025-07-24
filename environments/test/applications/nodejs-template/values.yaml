@@ -24,7 +24,7 @@ nodejs-template:
     # -- Service port
     port: 80
     # -- Target port for the application
-    targetPort: 8080
+    targetPort: 3000
 
   # -- Resource configuration
   resources:
