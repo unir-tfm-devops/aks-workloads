@@ -55,4 +55,4 @@ nodejs-template:
     secretName: "nodejs-template-secret"
     data:
       # -- Database password
-      DB_PASSWORD: nodejs-template-test-password"
+      DB_PASSWORD: "nodejs-template-test-password"
