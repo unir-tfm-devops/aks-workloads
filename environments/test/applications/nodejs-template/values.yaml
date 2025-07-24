@@ -1,22 +1,18 @@
 nodejs-template:
   # -- Override the name of the chart
   nameOverride: "nodejs-template"
-
   # -- Override the full name of the chart
   fullnameOverride: "nodejs-template"
-
   # -- Number of replicas to deploy
   replicaCount: 1
-
   # -- Image configuration
   image:
     # -- Docker image repository
     repository: unirtfmdevops.azurecr.io/nodejs-template
     # -- Docker image tag
-    tag: 0.1.0-11-g81a4551
+    tag: 0.1.0-12-gc5d7732
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
-
   # -- Service configuration
   service:
     # -- Kubernetes service type
@@ -25,7 +21,6 @@ nodejs-template:
     port: 80
     # -- Target port for the application
     targetPort: 3000
-
   # -- Resource configuration
   resources:
     requests:
@@ -38,7 +33,6 @@ nodejs-template:
       memory: "512Mi"
       # -- CPU limit
       cpu: "500m"
-
   # -- Environment variables configuration
   env:
     # -- Database configuration
@@ -46,7 +40,6 @@ nodejs-template:
     DB_PORT: "5432"
     DB_NAME: "nodejs-template-test"
     DB_USERNAME: "nodejs-template-test-user"
-
   # -- Secret configuration for sensitive data
   secrets:
     # -- Enable Kubernetes secrets for sensitive data
