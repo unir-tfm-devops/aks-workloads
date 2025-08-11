@@ -10,7 +10,7 @@ nodejs-template:
     # -- Docker image repository
     repository: unirtfmdevops.azurecr.io/nodejs-template
     # -- Docker image tag
-    tag: 0.1.0-16-g7ff36ed
+    tag: 0.1.0-17-g8e7260a
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Service configuration
