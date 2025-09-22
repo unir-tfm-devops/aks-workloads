@@ -4,5 +4,5 @@ version: 1.0.0
 description: Helm chart for nodejs-template deployment
 dependencies:
   - name: nodejs-template
-    version: 0.2.0-9-g17c6f48
+    version: 0.2.0-10-g249e120
     repository: "http://3.238.99.68"
